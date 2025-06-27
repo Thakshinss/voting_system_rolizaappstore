@@ -196,22 +196,61 @@ export default function Voting({ currentUser }: VotingProps) {
           })}
         </div>
 
-        {/* Submit Button */}
-        <div className="text-center">
-          <Button 
-            type="submit" 
-            size="lg"
-            disabled={selectedCandidates.length !== maxSelections || submitVotesMutation.isPending}
-            className="bg-success hover:bg-success/90"
-          >
-            <CheckCircle className="w-5 h-5 mr-2" />
-            {submitVotesMutation.isPending ? "Submitting..." : "Submit My Votes"}
-          </Button>
-          <p className="text-sm text-muted-foreground mt-2">
-            You must select exactly {maxSelections} candidates to proceed
-          </p>
+        {/* Submit Button Section */}
+        <div className="mt-12 mb-8">
+          <Card className="border-2 border-success/20 bg-success/5">
+            <CardContent className="text-center py-8">
+              <h3 className="text-xl font-semibold mb-4">Ready to Submit Your Votes?</h3>
+              <div className="mb-6">
+                <Badge variant="outline" className="text-lg px-4 py-2 mb-4">
+                  Selected: {selectedCandidates.length} / {maxSelections} candidates
+                </Badge>
+              </div>
+              
+              <Button 
+                type="submit" 
+                size="lg"
+                disabled={selectedCandidates.length !== maxSelections || submitVotesMutation.isPending}
+                className="bg-success hover:bg-success/90 text-white px-8 py-4 text-lg font-semibold shadow-lg"
+              >
+                <CheckCircle className="w-6 h-6 mr-3" />
+                {submitVotesMutation.isPending ? "Submitting Your Votes..." : "Submit My Votes"}
+              </Button>
+              
+              <div className="mt-4">
+                {selectedCandidates.length !== maxSelections ? (
+                  <p className="text-warning font-medium">
+                    Please select exactly {maxSelections} candidates to submit your votes
+                  </p>
+                ) : (
+                  <p className="text-success font-medium">
+                    Great! You've selected {maxSelections} candidates. Click submit to cast your votes.
+                  </p>
+                )}
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </form>
+
+      {/* Floating Submit Button for Mobile/Scrolling */}
+      {selectedCandidates.length > 0 && (
+        <div className="fixed bottom-6 right-6 z-50">
+          <Button 
+            onClick={handleSubmit}
+            size="lg"
+            disabled={selectedCandidates.length !== maxSelections || submitVotesMutation.isPending}
+            className={`rounded-full shadow-2xl px-6 py-6 ${
+              selectedCandidates.length === maxSelections 
+                ? 'bg-success hover:bg-success/90 text-white animate-pulse' 
+                : 'bg-warning hover:bg-warning/90 text-black'
+            }`}
+          >
+            <Vote className="w-5 h-5 mr-2" />
+            {selectedCandidates.length}/{maxSelections}
+          </Button>
+        </div>
+      )}
     </div>
   );
 }
