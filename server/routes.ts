@@ -121,8 +121,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get results
   app.get("/api/results", async (req, res) => {
     try {
+      // Disable caching to ensure fresh data
+      res.set('Cache-Control', 'no-cache, no-store, must-revalidate');
+      res.set('Pragma', 'no-cache');
+      res.set('Expires', '0');
+      res.set('ETag', ''); // Disable ETag caching
+      
       const candidates = await storage.getCandidateResults();
       const stats = await storage.getVotingStats();
+      
+      console.log("Fresh results query - candidates:", candidates.map(c => ({ name: c.name, votes: c.votes_received })));
       
       // Calculate percentages
       const candidatesWithPercentage = candidates.map(candidate => ({
@@ -134,7 +142,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       res.json({
         candidates: candidatesWithPercentage,
-        stats
+        stats,
+        timestamp: Date.now() // Add timestamp to force cache busting
       });
     } catch (error) {
       console.error("Get results error:", error);

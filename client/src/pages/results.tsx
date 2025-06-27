@@ -8,7 +8,10 @@ import { formatPercentage } from "@/lib/utils";
 export default function Results() {
   const { data, isLoading } = useQuery({
     queryKey: ["/api/results"],
-    refetchInterval: 5000, // Refresh every 5 seconds for real-time updates
+    refetchInterval: 2000, // Refresh every 2 seconds for real-time updates
+    refetchOnWindowFocus: true,
+    staleTime: 0, // Always consider data stale
+    gcTime: 0, // Don't cache the data (TanStack Query v5)
   });
 
   const candidates = data?.candidates || [];
