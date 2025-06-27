@@ -14,13 +14,15 @@ export default function Results() {
     gcTime: 0, // Don't cache the data (TanStack Query v5)
   });
 
-  const candidates = data?.candidates || [];
-  const stats = data?.stats || {
+  const candidates = (data as any)?.candidates || [];
+  const stats = (data as any)?.stats || {
     totalVotes: 0,
     votersParticipated: 0,
     remainingVoters: 0,
     participationRate: 0
   };
+
+
 
   const getRankIcon = (index: number) => {
     switch (index) {
@@ -164,9 +166,11 @@ export default function Results() {
                       <code className="bg-muted px-2 py-1 rounded text-sm">{candidate.voter_id}</code>
                     </td>
                     <td className="p-4">
-                      <Badge className="bg-success text-white">
-                        {candidate.votes_received}
-                      </Badge>
+                      <div className="flex items-center justify-center">
+                        <Badge className="bg-success text-white text-lg px-3 py-1 font-bold min-w-[2rem]">
+                          {candidate.votes_received || 0}
+                        </Badge>
+                      </div>
                     </td>
                     <td className="p-4 font-semibold">
                       {formatPercentage(candidate.percentage)}
