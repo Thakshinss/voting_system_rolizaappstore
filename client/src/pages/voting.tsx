@@ -49,13 +49,15 @@ export default function Voting({ currentUser }: VotingProps) {
     },
   });
 
-  const filteredCandidates = candidates.filter((candidate: any) => 
+  const filteredCandidates = (candidates as any[]).filter((candidate: any) => 
     candidate.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
     candidate.id !== currentUser?.id
   );
 
-  const handleCandidateSelect = (candidateId: number, checked: boolean) => {
-    if (checked) {
+  const handleCandidateSelect = (candidateId: number, checked: boolean | string) => {
+    const isChecked = checked === true || checked === "indeterminate";
+    
+    if (isChecked) {
       if (selectedCandidates.length >= maxSelections) {
         toast({
           title: "Selection limit reached",
@@ -64,9 +66,9 @@ export default function Voting({ currentUser }: VotingProps) {
         });
         return;
       }
-      setSelectedCandidates([...selectedCandidates, candidateId]);
+      setSelectedCandidates(prev => [...prev, candidateId]);
     } else {
-      setSelectedCandidates(selectedCandidates.filter(id => id !== candidateId));
+      setSelectedCandidates(prev => prev.filter(id => id !== candidateId));
     }
   };
 
@@ -180,7 +182,7 @@ export default function Voting({ currentUser }: VotingProps) {
                   </div>
                   <h6 className="font-semibold mb-2">{candidate.name}</h6>
                   <p className="text-sm text-muted-foreground mb-4">{candidate.voter_id}</p>
-                  <div className="flex items-center justify-center space-x-2">
+                  <div className="flex items-center justify-center space-x-2" onClick={(e) => e.stopPropagation()}>
                     <Checkbox
                       checked={isSelected}
                       disabled={isDisabled}

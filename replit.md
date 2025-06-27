@@ -106,6 +106,8 @@ The application is configured for deployment on Replit with the following setup:
 ```
 Changelog:
 - June 27, 2025. Initial setup
+- June 27, 2025. Fixed React infinite loop error in voting page checkbox component
+- June 27, 2025. Added 10 sample candidates and successfully tested voting functionality
 ```
 
 ## User Preferences
