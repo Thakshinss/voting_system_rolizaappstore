@@ -167,9 +167,9 @@ export default function Results() {
                     </td>
                     <td className="p-4">
                       <div className="flex items-center justify-center">
-                        <Badge className="bg-success text-white text-lg px-3 py-1 font-bold min-w-[2rem]">
-                          {candidate.votes_received || 0}
-                        </Badge>
+                        <div className="bg-green-600 text-white text-xl px-4 py-2 rounded-lg font-bold min-w-[3rem] text-center shadow-lg">
+                          {candidate.votes_received !== undefined ? candidate.votes_received : 0}
+                        </div>
                       </div>
                     </td>
                     <td className="p-4 font-semibold">
