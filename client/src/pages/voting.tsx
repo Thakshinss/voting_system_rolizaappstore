@@ -184,7 +184,7 @@ export default function Voting({ currentUser }: VotingProps) {
                     <Checkbox
                       checked={isSelected}
                       disabled={isDisabled}
-                      onChange={(checked) => handleCandidateSelect(candidate.id, checked)}
+                      onCheckedChange={(checked) => handleCandidateSelect(candidate.id, checked)}
                     />
                     <span className="text-sm">Select</span>
                   </div>
