@@ -1,11 +1,11 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Settings, UserPlus, Download, RotateCcw, BarChart3, Edit, Trash2, User, CheckCircle, Clock } from "lucide-react";
+import { Settings, UserPlus, Download, RotateCcw, BarChart3, Edit, Trash2, User, CheckCircle, Clock, Upload, FileSpreadsheet } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -13,6 +13,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { formatDate } from "@/lib/utils";
+import * as XLSX from 'xlsx';
 
 const addCandidateSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -23,12 +24,18 @@ type AddCandidateForm = z.infer<typeof addCandidateSchema>;
 
 export default function Admin() {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
+  const [uploadedCandidates, setUploadedCandidates] = useState<AddCandidateForm[]>([]);
+  const [isProcessingFile, setIsProcessingFile] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
   const { data: candidates = [], isLoading } = useQuery({
     queryKey: ["/api/candidates"],
   });
+
+  const candidateList = candidates as any[];
 
   const form = useForm<AddCandidateForm>({
     resolver: zodResolver(addCandidateSchema),
@@ -60,6 +67,95 @@ export default function Admin() {
       });
     },
   });
+
+  const bulkUploadMutation = useMutation({
+    mutationFn: async (candidates: AddCandidateForm[]) => {
+      const responses = await Promise.allSettled(
+        candidates.map(candidate => 
+          apiRequest("POST", "/api/candidates", candidate).then(res => res.json())
+        )
+      );
+      
+      const successful = responses.filter(result => result.status === 'fulfilled').length;
+      const failed = responses.filter(result => result.status === 'rejected').length;
+      
+      return { successful, failed, total: candidates.length };
+    },
+    onSuccess: (result) => {
+      toast({
+        title: "Bulk upload completed!",
+        description: `${result.successful} candidates added successfully. ${result.failed > 0 ? `${result.failed} failed.` : ''}`,
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/candidates"] });
+      setIsUploadModalOpen(false);
+      setUploadedCandidates([]);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error during bulk upload",
+        description: error.message || "An error occurred during bulk upload.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    setIsProcessingFile(true);
+    const reader = new FileReader();
+
+    reader.onload = (e) => {
+      try {
+        const data = new Uint8Array(e.target?.result as ArrayBuffer);
+        const workbook = XLSX.read(data, { type: 'array' });
+        const sheetName = workbook.SheetNames[0];
+        const worksheet = workbook.Sheets[sheetName];
+        const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+
+        // Skip header row and process data
+        const candidates: AddCandidateForm[] = [];
+        for (let i = 1; i < jsonData.length; i++) {
+          const row = jsonData[i] as any[];
+          if (row.length >= 2 && row[0] && row[1]) {
+            candidates.push({
+              name: String(row[0]).trim(),
+              voter_id: String(row[1]).trim(),
+            });
+          }
+        }
+
+        if (candidates.length === 0) {
+          toast({
+            title: "No valid data found",
+            description: "Please ensure your Excel file has 'Name' in column A and 'Voter ID' in column B.",
+            variant: "destructive",
+          });
+        } else {
+          setUploadedCandidates(candidates);
+          setIsUploadModalOpen(true);
+          toast({
+            title: "File processed successfully!",
+            description: `Found ${candidates.length} candidates ready to upload.`,
+          });
+        }
+      } catch (error) {
+        toast({
+          title: "Error processing file",
+          description: "Please ensure you uploaded a valid Excel file (.xlsx, .xls).",
+          variant: "destructive",
+        });
+      } finally {
+        setIsProcessingFile(false);
+      }
+    };
+
+    reader.readAsArrayBuffer(file);
+  };
 
   const onSubmit = (data: AddCandidateForm) => {
     addCandidateMutation.mutate(data);
@@ -134,6 +230,32 @@ export default function Admin() {
                 </form>
               </DialogContent>
             </Dialog>
+          </CardContent>
+        </Card>
+
+        <Card className="text-center">
+          <CardContent className="py-6">
+            <FileSpreadsheet className="w-12 h-12 text-blue-600 mx-auto mb-3" />
+            <h6 className="font-semibold mb-3">Bulk Upload</h6>
+            <div className="space-y-2">
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept=".xlsx,.xls"
+                onChange={handleFileUpload}
+                className="hidden"
+              />
+              <Button 
+                size="sm" 
+                variant="outline" 
+                className="text-blue-600 border-blue-600 w-full"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={isProcessingFile}
+              >
+                <Upload className="w-4 h-4 mr-2" />
+                {isProcessingFile ? "Processing..." : "Upload Excel"}
+              </Button>
+            </div>
           </CardContent>
         </Card>
 
@@ -217,13 +339,13 @@ export default function Admin() {
                       </td>
                     </tr>
                   ))
-                ) : candidates.length === 0 ? (
+                ) : candidateList.length === 0 ? (
                   <tr>
                     <td colSpan={7} className="p-8 text-center text-muted-foreground">
                       No candidates found. Add some candidates to get started.
                     </td>
                   </tr>
-                ) : candidates.map((candidate: any) => (
+                ) : candidateList.map((candidate: any) => (
                   <tr key={candidate.id} className="border-b hover:bg-muted/50">
                     <td className="p-4 font-semibold">{candidate.id}</td>
                     <td className="p-4">
@@ -273,6 +395,68 @@ export default function Admin() {
           </div>
         </CardContent>
       </Card>
+
+      {/* Bulk Upload Confirmation Dialog */}
+      <Dialog open={isUploadModalOpen} onOpenChange={setIsUploadModalOpen}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle className="flex items-center">
+              <FileSpreadsheet className="w-5 h-5 mr-2" />
+              Confirm Bulk Upload
+            </DialogTitle>
+            <DialogDescription>
+              Review the candidates found in your Excel file before uploading.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="max-h-96 overflow-y-auto">
+            <div className="mb-4 p-3 bg-blue-50 rounded-lg">
+              <p className="text-sm text-blue-800">
+                <strong>Found {uploadedCandidates.length} candidates</strong> in your Excel file.
+                Please review the data below and confirm to proceed.
+              </p>
+            </div>
+            
+            <div className="space-y-2">
+              <div className="grid grid-cols-2 gap-4 p-2 bg-muted rounded text-sm font-semibold">
+                <div>Name</div>
+                <div>Voter ID</div>
+              </div>
+              {uploadedCandidates.map((candidate, index) => (
+                <div key={index} className="grid grid-cols-2 gap-4 p-2 border-b">
+                  <div>{candidate.name}</div>
+                  <div><code className="bg-muted px-2 py-1 rounded text-xs">{candidate.voter_id}</code></div>
+                </div>
+              ))}
+            </div>
+          </div>
+          
+          <DialogFooter>
+            <Button 
+              type="button" 
+              variant="outline" 
+              onClick={() => {
+                setIsUploadModalOpen(false);
+                setUploadedCandidates([]);
+                if (fileInputRef.current) {
+                  fileInputRef.current.value = '';
+                }
+              }}
+            >
+              Cancel
+            </Button>
+            <Button 
+              type="button" 
+              onClick={() => bulkUploadMutation.mutate(uploadedCandidates)}
+              disabled={bulkUploadMutation.isPending}
+              className="bg-blue-600 hover:bg-blue-700"
+            >
+              <Upload className="w-4 h-4 mr-2" />
+              {bulkUploadMutation.isPending ? "Uploading..." : `Upload ${uploadedCandidates.length} Candidates`}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
