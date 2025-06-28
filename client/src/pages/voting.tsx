@@ -11,6 +11,7 @@ import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useLocation } from "wouter";
 
+
 interface VotingProps {
   currentUser: any;
 }
@@ -21,7 +22,7 @@ export default function Voting({ currentUser }: VotingProps) {
   const [searchTerm, setSearchTerm] = useState("");
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const maxSelections = 3;
+  const maxSelections = 15;
 
   const { data: candidates = [], isLoading } = useQuery({
     queryKey: ["/api/candidates"],
@@ -38,7 +39,7 @@ export default function Voting({ currentUser }: VotingProps) {
         description: "Thank you for participating in the voting process.",
       });
       queryClient.invalidateQueries({ queryKey: ["/api/results"] });
-      navigate("/results");
+      navigate("/thanks");
     },
     onError: (error: any) => {
       toast({
@@ -111,9 +112,11 @@ export default function Voting({ currentUser }: VotingProps) {
         <CardContent className="text-center py-6">
           <h2 className="text-3xl font-bold mb-2 flex items-center justify-center">
             <Vote className="w-8 h-8 mr-3" />
-            Cast Your Vote
+            செயற்குழு தேர்தல் 2025
           </h2>
-          <p className="text-lg">Select exactly 3 candidates you want to vote for</p>
+          <p>ஒருவர் 15 உறுப்பினர்களை தேர்வு செய்து கொள்ள வேண்டும்</p>
+          <p className="text-lg">Select exactly 15 candidates you want to vote for</p>
+          
         </CardContent>
       </Card>
 
@@ -123,7 +126,7 @@ export default function Voting({ currentUser }: VotingProps) {
           <Alert>
             <Info className="h-4 w-4" />
             <AlertDescription>
-              <strong>Instructions:</strong> You must select exactly 3 different candidates. 
+              <strong>Instructions:</strong> You must select exactly 15 different candidates. 
               You cannot vote for yourself or vote multiple times.
             </AlertDescription>
           </Alert>
@@ -178,10 +181,11 @@ export default function Voting({ currentUser }: VotingProps) {
               >
                 <CardContent className="p-6 text-center">
                   <div className="mb-4">
-                    <User className="w-12 h-12 mx-auto text-primary" />
+                    <Vote className="w-12 h-12 mx-auto text-primary"/>
+                    {/* <User className="w-12 h-12 mx-auto text-primary" /> */}
                   </div>
                   <h6 className="font-semibold mb-2">{candidate.name}</h6>
-                  <p className="text-sm text-muted-foreground mb-4">{candidate.voter_id}</p>
+                  {/* <p className="text-sm text-muted-foreground mb-4">{candidate.voter_id}</p> */}
                   <div className="flex items-center justify-center space-x-2" onClick={(e) => e.stopPropagation()}>
                     <Checkbox
                       checked={isSelected}
@@ -198,20 +202,20 @@ export default function Voting({ currentUser }: VotingProps) {
 
         {/* Submit Button Section */}
         <div className="mt-12 mb-8">
-          <Card className="border-2 border-success/20 bg-success/5">
+          <Card className="border-2 border-success/20 bg-success/5 bg-blue-700 text-white">
             <CardContent className="text-center py-8">
-              <h3 className="text-xl font-semibold mb-4">Ready to Submit Your Votes?</h3>
+              <h3 className="text-xl font-semibold mb-4 ">Ready to Submit Your Votes?</h3>
               <div className="mb-6">
-                <Badge variant="outline" className="text-lg px-4 py-2 mb-4">
+                <Badge variant="outline" className="text-lg px-4 py-2 mb-4 text-white">
                   Selected: {selectedCandidates.length} / {maxSelections} candidates
                 </Badge>
               </div>
               
               <Button 
                 type="submit" 
-                size="lg"
+                size="lg"      
                 disabled={selectedCandidates.length !== maxSelections || submitVotesMutation.isPending}
-                className="bg-success hover:bg-success/90 text-white px-8 py-4 text-lg font-semibold shadow-lg"
+                className="bg-red-500 hover:bg-success/90 text-white px-8 py-4 text-lg font-semibold shadow-lg"
               >
                 <CheckCircle className="w-6 h-6 mr-3" />
                 {submitVotesMutation.isPending ? "Submitting Your Votes..." : "Submit My Votes"}

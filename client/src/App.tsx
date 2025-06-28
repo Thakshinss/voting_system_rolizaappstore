@@ -10,7 +10,10 @@ import Voting from "@/pages/voting";
 import Results from "@/pages/results";
 import Status from "@/pages/status";
 import Admin from "@/pages/admin";
+import Thanks from "@/pages/thank";
 import NotFound from "@/pages/not-found";
+import { useLocation } from "wouter";
+
 
 function Router() {
   const [currentUser, setCurrentUser] = useState<any>(null);
@@ -32,10 +35,16 @@ function Router() {
     setCurrentUser(null);
     localStorage.removeItem("currentUser");
   };
+  const [location] = useLocation();
+  const shouldShowNavbar = location !== "/voting";
+  
 
   return (
     <div className="min-h-screen bg-background">
-      <Navbar currentUser={currentUser} onLogout={handleLogout} />
+      {shouldShowNavbar && (
+        <Navbar currentUser={currentUser} onLogout={handleLogout} />
+      )}
+      {/* <Navbar currentUser={currentUser} onLogout={handleLogout} /> */}
       
       <Switch>
         <Route path="/">
@@ -60,6 +69,9 @@ function Router() {
         
         <Route path="/results">
           <Results />
+        </Route>
+        <Route path="/thanks">
+          <Thanks />
         </Route>
         
         <Route path="/status">

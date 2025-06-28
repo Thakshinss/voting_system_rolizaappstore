@@ -164,6 +164,7 @@ export default function Admin() {
   return (
     <div className="container mx-auto mt-8 p-4">
       {/* Header */}
+      
       <Card className="mb-6 bg-slate-900 text-white border-0">
         <CardContent className="text-center py-6">
           <h2 className="text-3xl font-bold mb-2 flex items-center justify-center">
@@ -182,7 +183,7 @@ export default function Admin() {
             <h6 className="font-semibold mb-3">Add Candidate</h6>
             <Dialog open={isAddModalOpen} onOpenChange={setIsAddModalOpen}>
               <DialogTrigger asChild>
-                <Button size="sm">Add New</Button>
+                <Button size="sm" className="bg-slate-600">Add New</Button>
               </DialogTrigger>
               <DialogContent>
                 <DialogHeader>
@@ -219,10 +220,10 @@ export default function Admin() {
                     )}
                   </div>
                   <DialogFooter>
-                    <Button type="button" variant="outline" onClick={() => setIsAddModalOpen(false)}>
+                    <Button type="button" variant="outline" className="bg-blue-700" onClick={() => setIsAddModalOpen(false)}>
                       Cancel
                     </Button>
-                    <Button type="submit" disabled={addCandidateMutation.isPending}>
+                    <Button type="submit" className="bg-blue-800" disabled={addCandidateMutation.isPending}>
                       <UserPlus className="w-4 h-4 mr-2" />
                       {addCandidateMutation.isPending ? "Adding..." : "Add Candidate"}
                     </Button>

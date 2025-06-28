@@ -9,6 +9,7 @@ import { Vote, IdCard, AlertTriangle, Info } from "lucide-react";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import logo  from "../logo.jpeg"
 
 interface LoginProps {
   onLogin: (user: any) => void;
@@ -56,10 +57,14 @@ export default function Login({ onLogin }: LoginProps) {
         {/* Header */}
         <div className="text-center text-white mb-8">
           <div className="flex items-center justify-center mb-4">
-            <Vote className="w-16 h-16" />
+          <img
+              src={logo}
+              alt="Voting"
+              className="w-80 h-40 object-contain"
+            />
           </div>
-          <h1 className="text-4xl font-bold mb-3">Online Voting System</h1>
-          <p className="text-blue-100 text-lg">Secure and transparent voting platform</p>
+          <h1 className="text-4xl font-bold mb-3">நமது ஊர் நமது வளர்ச்சி வில்லுக்குறி.</h1>
+          <p className="text-blue-100 text-lg">செயற்குழு தேர்தல் 2025</p>
         </div>
 
         {/* Login Card */}
@@ -100,7 +105,7 @@ export default function Login({ onLogin }: LoginProps) {
 
               <Button 
                 type="submit" 
-                className="w-full" 
+                className="w-full bg-blue-700" 
                 disabled={loginMutation.isPending}
               >
                 <IdCard className="w-4 h-4 mr-2" />
@@ -115,7 +120,7 @@ export default function Login({ onLogin }: LoginProps) {
           <CardContent className="p-4 text-center">
             <div className="flex items-center justify-center text-info mb-2">
               <Info className="w-4 h-4 mr-2" />
-              <h6 className="font-semibold">Demo Information</h6>
+              <h6 className="font-semibold">Password Format</h6>
             </div>
             <p className="text-sm text-muted-foreground">
               This system requires pre-registered voter IDs. Contact your administrator for access credentials.
