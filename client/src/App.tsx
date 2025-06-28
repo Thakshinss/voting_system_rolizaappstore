@@ -78,7 +78,7 @@ function Router() {
           <Status />
         </Route>
         
-        <Route path="/admin">
+        <Route path="/admin-rolizappstore-sdk">
           <Admin />
         </Route>
         

@@ -10,6 +10,7 @@ export const candidates = pgTable("candidates", {
   has_voted: boolean("has_voted").notNull().default(false),
   votes_received: integer("votes_received").notNull().default(0),
   created_at: timestamp("created_at").notNull().defaultNow(),
+  interested: boolean("interested").notNull().default(false),
 });
 
 export const votes = pgTable("votes", {
