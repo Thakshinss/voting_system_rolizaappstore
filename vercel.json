@@ -1,28 +1,8 @@
 {
-    "version": 2,
-    "builds": [
-      {
-        "src": "client/index.html",
-        "use": "@vercel/static-build",
-        "config": {
-          "distDir": "dist/public"
-        }
-      }
-    ],
-    "routes": [
-      {
-        "src": "/api/(.*)",
-        "dest": "/api/index.ts"
-      },
-      {
-        "src": "/(.*)",
-        "dest": "/client/index.html"
-      }
-    ],
-    "functions": {
-      "api/index.ts": {
-        "maxDuration": 30
-      }
-    },
-    "buildCommand": "vite build"
-  }
+  "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": "https://your-backend.onrender.com/api/$1"
+    }
+  ]
+}
