@@ -123,10 +123,10 @@ export default function Login({ onLogin }: LoginProps) {
               <h6 className="font-semibold">Voter_id Format</h6>
             </div>
             <p className="text-sm text-muted-foreground">
-            உங்கள் வாக்காளர் ID என்பது நாட்டின் குறியீடு கூடிய உங்கள் மொபைல் எண்ணாகும். (eg.+919384260514) ,அல்லது உங்கள் இரண்டாவது பெயர் 
+            உங்கள் வாக்காளர் ID என்பது நாட்டின் குறியீடு கூடிய உங்கள் மொபைல் எண்ணாகும். (eg.+917833969696) ,அல்லது உங்கள் இரண்டாவது பெயர் 
             </p>
             <p className="text-sm text-muted-foreground">
-              Your voter id is your mobile number with country code (eg.+919384260514) or Your second name
+              Your voter id is your mobile number with country code (eg.+917833969696) or Your second name
             </p>
           </CardContent>
         </Card>
