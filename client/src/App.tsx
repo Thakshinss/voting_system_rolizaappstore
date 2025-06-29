@@ -36,7 +36,8 @@ function Router() {
     localStorage.removeItem("currentUser");
   };
   const [location] = useLocation();
-  const shouldShowNavbar = location !== "/voting";
+  // const shouldShowNavbar = location !== "/voting";
+  const shouldShowNavbar = !(location === "/" || location.startsWith("/voting"));
   
 
   return (
