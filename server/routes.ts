@@ -72,8 +72,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { voter_id, selected_candidates } = req.body;
       
-      if (!voter_id || !Array.isArray(selected_candidates) || selected_candidates.length !== 15) {
-        return res.status(400).json({ message: "Must select exactly 15 candidates" });
+      if (!voter_id || !Array.isArray(selected_candidates) || selected_candidates.length !== 20) {
+        return res.status(400).json({ message: "Must select exactly 20 candidates" });
       }
       
       const voter = await storage.getCandidateByVoterId(voter_id);

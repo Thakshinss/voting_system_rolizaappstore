@@ -22,7 +22,7 @@ export default function Voting({ currentUser }: VotingProps) {
   const [searchTerm, setSearchTerm] = useState("");
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const maxSelections = 15;
+  const maxSelections = 20;
 
   const { data: candidates = [], isLoading } = useQuery({
     queryKey: ["/api/candidates"],
@@ -114,8 +114,8 @@ export default function Voting({ currentUser }: VotingProps) {
             <Vote className="w-8 h-8 mr-3" />
             செயற்குழு தேர்தல் 2025
           </h2>
-          <p>ஒருவர் 15 உறுப்பினர்களை தேர்வு செய்து கொள்ள வேண்டும்</p>
-          <p className="text-lg">Select exactly 15 candidates you want to vote for</p>
+          <p>ஒருவர் 20 உறுப்பினர்களை தேர்வு செய்து கொள்ள வேண்டும்</p>
+          <p className="text-lg">Select exactly 20 candidates you want to vote for</p>
           
         </CardContent>
       </Card>
@@ -126,7 +126,7 @@ export default function Voting({ currentUser }: VotingProps) {
           <Alert>
             <Info className="h-4 w-4" />
             <AlertDescription>
-              <strong>Instructions:</strong> You must select exactly 15 different candidates. 
+              <strong>Instructions:</strong> You must select exactly 20 different candidates. 
               You cannot vote for yourself or vote multiple times.
             </AlertDescription>
           </Alert>
